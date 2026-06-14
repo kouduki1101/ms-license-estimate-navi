@@ -441,7 +441,6 @@ function artifactKind(filePath) {
   if (base.endsWith(".pptx")) return "PowerPoint";
   if (base.endsWith(".md")) return base.includes("audit") ? "監査MD" : base.includes("azure-meter") ? "Azure明細MD" : "Markdown";
   if (base.endsWith(".json")) return "JSON";
-  if (base.endsWith(".png")) return "Preview";
   if (base.endsWith(".csv")) return "CSV";
   return "File";
 }
@@ -449,7 +448,7 @@ function artifactKind(filePath) {
 async function outputsList() {
   const files = await listFilesRecursive(OUTPUT_DIR);
   return files
-    .filter((filePath) => /\.(md|xlsx|pptx|json|png)$/i.test(filePath))
+    .filter((filePath) => /\.(md|xlsx|pptx|json)$/i.test(filePath))
     .filter((filePath) => !path.basename(filePath).startsWith("artifact-build-manifest"))
     .map((filePath) => {
       const stat = fsSync.statSync(filePath);

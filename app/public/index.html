@@ -7,93 +7,106 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="app-header">
+    <header class="topbar">
       <div>
-        <p class="eyebrow">MS LICENSE ESTIMATE NAVI</p>
+        <p class="eyebrow">Microsoft Architecture & License Estimator</p>
         <h1>MSライセンス概算ナビ</h1>
-        <p class="header-copy">
-          作りたい業務システムをAIと壁打ちし、Microsoftサービス構成・必要ライセンス・概算コストをその場で組み替える提案前ワークベンチ
-        </p>
+        <p class="lead">壁打ち内容から構成案、アーキテクチャ、必要ライセンス、概算コストを組み替える提案前ダッシュボード</p>
       </div>
-      <div class="header-actions">
+      <div class="topbar-actions">
         <button id="refreshBtn" class="button secondary" type="button">更新</button>
-        <button id="saveBtn" class="button secondary" type="button">条件を保存</button>
+        <button id="saveBtn" class="button secondary" type="button">条件保存</button>
         <button id="generateBtn" class="button primary" type="button">提案パック生成</button>
       </div>
     </header>
 
-    <main class="page-shell">
-      <section class="summary-band" aria-label="概算サマリー">
-        <div class="metric-block">
-          <span>月額 USD</span>
+    <main class="app-shell">
+      <section class="metric-strip" aria-label="概算サマリー">
+        <div class="metric-card emphasis">
+          <span>月額概算</span>
           <strong id="monthlyUsd">-</strong>
+          <small id="monthlyJpy">-</small>
         </div>
-        <div class="metric-block">
-          <span>月額 JPY</span>
-          <strong id="monthlyJpy">-</strong>
-        </div>
-        <div class="metric-block">
+        <div class="metric-card">
           <span>年額 USD</span>
           <strong id="annualUsd">-</strong>
+          <small>税・割引除外</small>
         </div>
-        <div class="metric-block">
-          <span>追加SKU</span>
+        <div class="metric-card">
+          <span>追加購入候補</span>
           <strong id="additionalSkuCount">-</strong>
+          <small>既存ライセンス控除後</small>
         </div>
-        <div class="metric-block">
-          <span>価格基準</span>
-          <strong id="pricingAsOf">-</strong>
+        <div class="metric-card">
+          <span>設計タイプ</span>
+          <strong id="scenarioType">-</strong>
+          <small id="pricingAsOf">-</small>
         </div>
       </section>
 
-      <section class="workbench-grid">
-        <section class="panel chat-panel">
-          <div class="panel-heading">
+      <section class="studio-grid">
+        <section class="panel prompt-panel">
+          <div class="panel-head">
             <div>
-              <h2>壁打ち</h2>
-              <p>ユーザーが「こんなものを作りたい」と投げる場所</p>
+              <h2>壁打ち入力</h2>
+              <p>作りたい業務、利用者、データ、出力、制約を書いてください。</p>
             </div>
+          </div>
+
+          <textarea id="promptInput" class="prompt-box" rows="8" placeholder="例: 営業担当がTeamsから過去提案書、FAQ、商談メモを検索し、根拠付き回答と提案書ドラフトを作れるAIエージェントを作りたい。利用者120名、レポートも見たい。"></textarea>
+
+          <div class="preset-grid">
+            <button class="preset-card" type="button" data-prompt="営業担当がTeamsから過去提案書、FAQ、商談メモを検索し、根拠付き回答と提案書ドラフトを作れるAIエージェントを作りたい。利用者120名、レポートも見たい。">
+              <strong>営業ナレッジAI</strong>
+              <span>RAG、提案書ドラフト、利用分析</span>
+            </button>
+            <button class="preset-card" type="button" data-prompt="稟議や過去承認案件を検索し、類似案件、承認条件、注意点を要約する社内エージェントを作りたい。申請画面と承認フローも含めたい。">
+              <strong>稟議・承認支援</strong>
+              <span>Power Apps、Dataverse、承認フロー</span>
+            </button>
+            <button class="preset-card" type="button" data-prompt="地政学レポートやPDFを読み込み、Evidence Packとして要点、根拠、リスク、対応案を生成する業務支援ツールを作りたい。">
+              <strong>Evidence Pack</strong>
+              <span>文書取込、根拠抽出、リスク整理</span>
+            </button>
+            <button class="preset-card" type="button" data-prompt="複数部門のExcel、SharePointリスト、業務データを集約して、経営向けKPIダッシュボードと月次レポートをPower BIで出したい。">
+              <strong>経営BI</strong>
+              <span>データ集約、Power BI、月次配信</span>
+            </button>
+          </div>
+
+          <div class="prompt-actions">
+            <button id="sendPromptBtn" class="button primary" type="button">構成案を作る</button>
+            <button id="resetScenarioBtn" class="button ghost" type="button">初期化</button>
           </div>
 
           <div id="chatLog" class="chat-log" aria-live="polite"></div>
-
-          <div class="prompt-chips" aria-label="入力例">
-            <button class="chip" type="button" data-prompt="営業担当が過去提案書、FAQ、商談メモを検索して、提案書のドラフトと回答根拠を作れるAIエージェントを作りたい。Teamsから使いたい。">営業ナレッジAI</button>
-            <button class="chip" type="button" data-prompt="稟議や過去承認案件を検索して、類似案件、承認条件、注意点を要約する社内エージェントを作りたい。承認フローも回したい。">稟議検索</button>
-            <button class="chip" type="button" data-prompt="地政学レポートを読み込み、Evidence Packとして要点、根拠、リスク、対応案を生成する業務支援ツールを作りたい。">Evidence Pack</button>
-          </div>
-
-          <label class="field chat-input-field">
-            <span>相談内容</span>
-            <textarea id="promptInput" rows="5" placeholder="例：営業部向けに、過去案件やFAQを検索して提案書ドラフトを作るAIエージェントを作りたい。Teamsで利用、120名、レポートも見たい。"></textarea>
-          </label>
-
-          <div class="chat-actions">
-            <button id="sendPromptBtn" class="button primary" type="button">AIに相談する</button>
-            <button id="resetScenarioBtn" class="button ghost" type="button">初期案に戻す</button>
-          </div>
         </section>
 
         <section class="panel architecture-panel">
-          <div class="panel-heading">
+          <div class="panel-head split">
             <div>
-              <h2>AI提案アーキテクチャ</h2>
-              <p id="architectureSubtitle">入力内容からMicrosoftサービス構成を組み立てます</p>
+              <h2 id="architectureTitle">アーキテクチャ案</h2>
+              <p id="architectureSubtitle">入力に応じてノードと接続を組み替えます。</p>
             </div>
+            <span id="fitBadge" class="fit-badge">draft</span>
           </div>
 
           <div id="architectureCanvas" class="architecture-canvas" aria-label="アーキテクチャ図"></div>
 
-          <div class="proposal-grid">
-            <div class="proposal-block">
+          <div class="decision-grid">
+            <div>
               <span>提案方針</span>
               <p id="proposalIntent">-</p>
             </div>
-            <div class="proposal-block">
-              <span>主な前提</span>
+            <div>
+              <span>設計が変わった点</span>
+              <ul id="changeList"></ul>
+            </div>
+            <div>
+              <span>主要な前提</span>
               <ul id="assumptionList"></ul>
             </div>
-            <div class="proposal-block">
+            <div>
               <span>非機能観点</span>
               <ul id="nfrList"></ul>
             </div>
@@ -101,26 +114,25 @@
         </section>
 
         <aside class="panel control-panel">
-          <div class="panel-heading">
+          <div class="panel-head">
             <div>
-              <h2>動的設定</h2>
-              <p>人数・既存ライセンス・Azure利用量を変えると即時再計算</p>
+              <h2>試算条件</h2>
+              <p>値を変えるとライセンス数量とコストが即時更新されます。</p>
             </div>
           </div>
 
           <div class="control-section">
-            <h3>案件</h3>
-            <label class="field">
+            <label class="field wide">
               <span>案件名</span>
               <input id="projectName" type="text" />
             </label>
-            <label class="field">
+            <label class="field wide">
               <span>業務目的</span>
               <textarea id="businessPurpose" rows="3"></textarea>
             </label>
           </div>
 
-          <div class="control-section two-col">
+          <div class="control-section">
             <h3>利用規模</h3>
             <label class="field">
               <span>利用ユーザー数</span>
@@ -140,8 +152,8 @@
             </label>
           </div>
 
-          <div class="control-section two-col">
-            <h3>Azure利用量</h3>
+          <div class="control-section">
+            <h3>Azure / Power Platform利用量</h3>
             <label class="field">
               <span>AOAI 入力 tokens/月</span>
               <input id="inputTokens" type="number" min="0" step="1000" />
@@ -168,7 +180,7 @@
             </label>
           </div>
 
-          <div class="control-section two-col">
+          <div class="control-section">
             <h3>既存ライセンス</h3>
             <label class="field">
               <span>M365 E3</span>
@@ -190,20 +202,21 @@
         </aside>
       </section>
 
-      <section class="detail-grid">
-        <section class="panel table-panel">
-          <div class="panel-heading">
+      <section class="result-grid">
+        <section class="panel">
+          <div class="panel-head split">
             <div>
               <h2>ライセンス・Azure概算</h2>
-              <p id="estimateNote">設定値とSKUマスタに基づく提案前概算</p>
+              <p id="estimateNote">価格はUSD公式ベースを優先し、JPYへ換算します。</p>
             </div>
+            <div id="serviceTags" class="service-tags"></div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>サービス / SKU</th>
-                  <th>必要理由</th>
+                  <th>採用理由</th>
                   <th>必要数</th>
                   <th>既存</th>
                   <th>追加</th>
@@ -216,11 +229,11 @@
           </div>
         </section>
 
-        <section class="panel download-panel">
-          <div class="panel-heading">
+        <section class="panel output-panel">
+          <div class="panel-head split">
             <div>
-              <h2>出力・ダウンロード</h2>
-              <p>保存した条件でMarkdown / Excel / PowerPointを生成</p>
+              <h2>出力</h2>
+              <p>画像単体ではなく、提案・試算に使う成果物だけを表示します。</p>
             </div>
             <span id="jobBadge" class="status-pill">idle</span>
           </div>

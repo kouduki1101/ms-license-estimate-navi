@@ -100,7 +100,6 @@ function artifactKind(filePath) {
   if (base.endsWith(".pptx")) return "PowerPoint";
   if (base.endsWith(".md")) return base.includes("audit") ? "監査MD" : base.includes("azure-meter") ? "Azure明細MD" : "Markdown";
   if (base.endsWith(".json")) return "JSON";
-  if (base.endsWith(".png")) return "Preview";
   return "File";
 }
 
@@ -133,7 +132,7 @@ async function copyOutputs() {
       const relativePath = path.join(relativeDir, entry.name);
       if (entry.isDirectory()) {
         await walk(sourcePath, relativePath);
-      } else if (/\.(md|xlsx|pptx|json|png)$/i.test(entry.name) && !entry.name.startsWith("artifact-build-manifest")) {
+      } else if (/\.(md|xlsx|pptx|json)$/i.test(entry.name) && !entry.name.startsWith("artifact-build-manifest")) {
         const targetPath = path.join(DOCS_DIR, "outputs", relativePath);
         await fs.mkdir(path.dirname(targetPath), { recursive: true });
         await fs.copyFile(sourcePath, targetPath);

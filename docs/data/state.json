@@ -406,38 +406,6 @@
       "downloadUrl": "outputs/batch-20260614/ms-license-estimate-営業部向けai業務支援poc-20260614.md"
     },
     {
-      "name": "source-notes.png",
-      "relative": "outputs/excel-previews/source-notes.png",
-      "kind": "Preview",
-      "bytes": 147176,
-      "modifiedAt": "2026-06-14T09:20:20.757Z",
-      "downloadUrl": "outputs/excel-previews/source-notes.png"
-    },
-    {
-      "name": "price-trend.png",
-      "relative": "outputs/excel-previews/price-trend.png",
-      "kind": "Preview",
-      "bytes": 194068,
-      "modifiedAt": "2026-06-14T09:20:20.411Z",
-      "downloadUrl": "outputs/excel-previews/price-trend.png"
-    },
-    {
-      "name": "license-estimate.png",
-      "relative": "outputs/excel-previews/license-estimate.png",
-      "kind": "Preview",
-      "bytes": 180128,
-      "modifiedAt": "2026-06-14T09:20:19.566Z",
-      "downloadUrl": "outputs/excel-previews/license-estimate.png"
-    },
-    {
-      "name": "summary.png",
-      "relative": "outputs/excel-previews/summary.png",
-      "kind": "Preview",
-      "bytes": 75054,
-      "modifiedAt": "2026-06-14T09:20:18.624Z",
-      "downloadUrl": "outputs/excel-previews/summary.png"
-    },
-    {
       "name": "price-source-audit-20260612.json",
       "relative": "outputs/price-source-audit-20260612.json",
       "kind": "JSON",
