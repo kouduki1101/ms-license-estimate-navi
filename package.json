@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node app/server.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "generate:md": "node scripts/generate-report.mjs --existing-licenses existing_licenses.csv",
+    "generate:xlsx": "node scripts/generate-excel.mjs --existing-licenses existing_licenses.csv",
+    "generate:pptx": "node scripts/generate-powerpoint-summary.mjs --existing-licenses existing_licenses.csv"
+  }
+}

@@ -1,0 +1,3 @@
+currencyCode,retailPrice,unitPrice,serviceName,productName,skuName,meterName,unitOfMeasure,armRegionName,location,effectiveStartDate,isPrimaryMeterRegion
+USD,0.00015,0.00015,Azure OpenAI,Azure OpenAI,gpt-4o-mini,Input Tokens,1K Tokens,eastus,US East,2026-01-01T00:00:00Z,true
+USD,0.00060,0.00060,Azure OpenAI,Azure OpenAI,gpt-4o-mini,Output Tokens,1K Tokens,eastus,US East,2026-01-01T00:00:00Z,true

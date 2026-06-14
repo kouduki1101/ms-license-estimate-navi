@@ -1,0 +1,111 @@
+{
+  "version": "2026-06-14",
+  "description": "MSライセンス概算ナビ用のSKU候補抽出ルール。業務目的と必要機能から、提案前概算に含めるMicrosoft SKUを選定する。",
+  "text_fields": [
+    "requirements.business_purpose",
+    "requirements.proposal_intent",
+    "requirements.required_capabilities[]"
+  ],
+  "presets": [
+    {
+      "preset_id": "sales-ai-poc",
+      "label": "営業ナレッジAIエージェント",
+      "description": "営業担当が過去提案書、FAQ、商談メモを検索し、根拠付き回答と提案書ドラフトを生成するPoC。",
+      "default_keywords": ["営業", "提案", "FAQ", "商談メモ", "ナレッジ検索", "生成AI", "エージェント", "レポート"],
+      "recommended_sku_ids": [
+        "SKU-M365-E3",
+        "SKU-COPILOTSTUDIO-MESSAGES",
+        "SKU-AZURE-OPENAI-TOKENS",
+        "SKU-POWERAUTOMATE-PREMIUM",
+        "SKU-POWERBI-PRO",
+        "SKU-ENTRA-ID-P1",
+        "SKU-AZURE-MONITOR"
+      ]
+    },
+    {
+      "preset_id": "approval-workflow",
+      "label": "稟議・承認支援エージェント",
+      "description": "過去稟議を検索し、類似案件や承認条件を提示し、承認フローへ接続する業務アプリ案件。",
+      "default_keywords": ["稟議", "申請", "承認", "ワークフロー", "履歴管理", "監査ログ"],
+      "recommended_sku_ids": [
+        "SKU-M365-E3",
+        "SKU-POWERAPPS-PREMIUM",
+        "SKU-POWERAUTOMATE-PREMIUM",
+        "SKU-DATAVERSE-CAPACITY",
+        "SKU-COPILOTSTUDIO-MESSAGES",
+        "SKU-AZURE-OPENAI-TOKENS",
+        "SKU-ENTRA-ID-P1",
+        "SKU-AZURE-MONITOR"
+      ]
+    },
+    {
+      "preset_id": "executive-reporting",
+      "label": "経営レポート・BI",
+      "description": "複数データソースを集約し、Power BIで経営・部門ダッシュボードを提供する案件。",
+      "default_keywords": ["経営レポート", "BI", "ダッシュボード", "KPI", "集計", "可視化"],
+      "recommended_sku_ids": [
+        "SKU-M365-E3",
+        "SKU-POWERBI-PRO",
+        "SKU-POWERAUTOMATE-PREMIUM",
+        "SKU-ENTRA-ID-P1"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "sku_id": "SKU-M365-E3",
+      "match_any": ["microsoft 365", "m365", "sharepoint", "teams", "document collaboration", "knowledge base", "文書共有", "ナレッジ", "社内ポータル"],
+      "selection_reason": "SharePoint、Teams、Office文書、基本IDを業務基盤として利用するため。"
+    },
+    {
+      "sku_id": "SKU-POWERAPPS-PREMIUM",
+      "match_any": ["power apps", "business app", "dataverse", "業務アプリ", "アプリ", "フォーム", "申請画面", "入力画面"],
+      "selection_reason": "Power Apps、Dataverse、プレミアムコネクタを使う業務アプリが必要なため。"
+    },
+    {
+      "sku_id": "SKU-POWERAUTOMATE-PREMIUM",
+      "match_any": ["power automate", "workflow", "flow", "ワークフロー", "自動化", "承認", "通知", "連携"],
+      "selection_reason": "承認、通知、外部連携、プレミアムコネクタを使う自動化が必要なため。"
+    },
+    {
+      "sku_id": "SKU-COPILOTSTUDIO-MESSAGES",
+      "match_any": ["copilot studio", "agent", "bot", "chat", "エージェント", "チャット", "対話", "会話"],
+      "selection_reason": "会話型業務エージェントを提供するため。"
+    },
+    {
+      "sku_id": "SKU-POWERBI-PRO",
+      "match_any": ["power bi", "report", "dashboard", "bi", "レポート", "ダッシュボード", "可視化", "分析", "kpi"],
+      "selection_reason": "レポート作成と共有閲覧が必要なため。"
+    },
+    {
+      "sku_id": "SKU-DATAVERSE-CAPACITY",
+      "match_any": ["dataverse", "database", "データベース", "構造化データ"],
+      "selection_reason": "Dataverse上に業務データ、履歴、設定値を保持するため。"
+    },
+    {
+      "sku_id": "SKU-AZURE-OPENAI-TOKENS",
+      "match_any": ["azure openai", "openai", "summarization", "生成ai", "ai", "要約", "rag", "検索", "回答生成", "ドラフト", "自然言語"],
+      "selection_reason": "要約、検索拡張生成、回答生成、ドラフト作成にAzure OpenAIを使うため。"
+    },
+    {
+      "sku_id": "SKU-AZURE-FUNCTIONS",
+      "match_any": ["azure functions", "functions", "api", "batch", "job", "外部連携", "バッチ", "ジョブ"],
+      "selection_reason": "軽量API、外部連携、非同期ジョブをサーバーレスで実行するため。"
+    },
+    {
+      "sku_id": "SKU-AZURE-MONITOR",
+      "match_any": ["azure monitor", "monitoring", "audit", "log", "監査", "監視", "ログ", "利用状況", "アラート"],
+      "selection_reason": "利用ログ、監査ログ、エラー監視が必要なため。"
+    },
+    {
+      "sku_id": "SKU-ENTRA-ID-P1",
+      "match_any": ["entra", "authentication", "sso", "認証", "条件付きアクセス", "id管理", "アクセス制御"],
+      "selection_reason": "SSO、条件付きアクセス、ID制御を設計に含めるため。"
+    },
+    {
+      "sku_id": "SKU-DEFENDER-BUSINESS",
+      "match_any": ["defender", "endpoint", "security", "セキュリティ", "端末", "脅威対策", "マルウェア"],
+      "selection_reason": "端末保護や基本的な脅威対策を含めるため。"
+    }
+  ]
+}

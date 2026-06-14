@@ -1,0 +1,3 @@
+existing_license_id,license_name,product_name,sku_name,quantity,assigned_scope,applicable_services,notes
+EL-001,Microsoft 365 E3,Microsoft 365,E3,120,全社またはPoC対象部門,SharePoint Online;Teams;Office apps;Exchange Online;Entra ID P1,ダッシュボード入力値
+EL-002,Power BI Pro,Power BI,Pro,30,レポート作成者・閲覧者,Power BI,ダッシュボード入力値

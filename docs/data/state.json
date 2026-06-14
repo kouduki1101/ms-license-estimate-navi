@@ -1,0 +1,480 @@
+{
+  "estimate": {
+    "estimate_id": "EST-20260612-001",
+    "project_name": "営業部向けAI業務支援PoC",
+    "customer_name": "",
+    "estimate_purpose": "提案前概算",
+    "base_currency": "USD",
+    "converted_currency": "JPY",
+    "fx_rate_usd_jpy": 155.2,
+    "pricing_as_of": "2026-06-14T09:00:00+09:00",
+    "fx_as_of": "2026-06-12T09:00:00+09:00",
+    "status": "draft",
+    "pricing_as_of_label": "2026-06-14 09:00 +09:00",
+    "fx_as_of_label": "2026-06-12 09:00 +09:00"
+  },
+  "requirements": {
+    "business_purpose": "営業担当が過去提案書、FAQ、商談メモを検索し、提案書ドラフトと回答根拠を作成できるAIエージェントを構築する。",
+    "proposal_intent": "TeamsからCopilot Studioエージェントを利用し、SharePointのナレッジとAzure OpenAIを組み合わせて、回答生成・要約・提案書ドラフト作成を支援する。",
+    "target_departments": [
+      "営業部",
+      "営業企画",
+      "プリセールス"
+    ],
+    "region": "Japan",
+    "user_count": 120,
+    "admin_count": 5,
+    "maker_count": 15,
+    "power_bi_viewer_count": 30,
+    "external_user_count": 0,
+    "required_capabilities": [
+      "Microsoft 365 document collaboration",
+      "Teams collaboration",
+      "SharePoint knowledge base",
+      "Copilot Studio agent",
+      "Azure OpenAI summarization",
+      "RAG search",
+      "AI draft generation",
+      "Power Automate workflow",
+      "Power BI reporting",
+      "Microsoft Entra ID authentication",
+      "Audit and security monitoring"
+    ],
+    "architecture": {
+      "channel": "Teams / Web",
+      "conversation": "Copilot Studio",
+      "app": "Power Apps",
+      "data": "SharePoint / Dataverse",
+      "ai": "Azure OpenAI",
+      "automation": "Power Automate / Functions",
+      "analytics": "Power BI",
+      "security": "Entra ID / Azure Monitor"
+    },
+    "assumptions": [
+      "提案前の概算であり、EA/CSP割引、税、契約条件は含めない。",
+      "価格はSKUマスタの公式価格スナップショットを優先し、不足分は明示した仮単価で計算する。",
+      "Microsoft 365 E3を既存保有している場合、SharePoint/Teams/基本IDの追加費用は既存分で控除する。"
+    ],
+    "nfr": [
+      "認証はEntra IDを前提にし、必要に応じて条件付きアクセスを設計する。",
+      "利用ログ、エラー、監査ログはAzure Monitorに集約する。",
+      "PoCでは月次利用量を設定値として管理し、本番前に実績値で再見積もりする。"
+    ],
+    "monthly_usage_assumptions": {
+      "copilot_studio_messages": 50000,
+      "azure_openai": {
+        "model": "gpt-4o-mini-0718",
+        "region": "japaneast",
+        "region_display_name": "Japan East",
+        "input_tokens": 20000000,
+        "output_tokens": 5000000,
+        "pricing_unit": "1K tokens",
+        "input_meter_name": "gpt-4o-mini-0718-Inp-glbl Tokens",
+        "output_meter_name": "gpt-4o-mini-0718-Outp-glbl Tokens",
+        "input_unit_price_usd_per_1k_tokens": 0.00015,
+        "output_unit_price_usd_per_1k_tokens": 0.0006,
+        "estimated_monthly_usd": 6
+      },
+      "azure_openai_input_tokens": 20000000,
+      "azure_openai_output_tokens": 5000000,
+      "power_automate_flow_runs": 30000,
+      "function_executions": 30000,
+      "dataverse_storage_gb": 20,
+      "log_ingestion_gb": 1,
+      "sharepoint_storage_gb": 500
+    },
+    "unknown_items": [
+      {
+        "item": "既存Microsoft 365プランの詳細",
+        "assumption": "Microsoft 365 E3相当が120ユーザー分あるものとして仮置きする。",
+        "impact": "SharePoint、Teams、Office、Entra ID P1の追加費用判定に影響する。"
+      },
+      {
+        "item": "Azure OpenAIモデルとリージョン",
+        "assumption": "PoC段階ではgpt-4o-mini、Japan Eastを代表モデル・リージョンとして概算する。",
+        "impact": "Azure従量課金の単価と月額費用に影響する。"
+      }
+    ]
+  },
+  "skuCatalog": [
+    {
+      "sku_id": "SKU-M365-E3",
+      "service_category": "Microsoft 365",
+      "product_name": "Microsoft 365",
+      "sku_name": "E3",
+      "billing_unit": "user/month",
+      "quantity_driver": "user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-plans-and-pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 36,
+      "unit_price_jpy": 5587.2,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-M365-E5",
+      "service_category": "Microsoft 365",
+      "product_name": "Microsoft 365",
+      "sku_name": "E5",
+      "billing_unit": "user/month",
+      "quantity_driver": "user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-plans-and-pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 57,
+      "unit_price_jpy": 8846.4,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-POWERAPPS-PREMIUM",
+      "service_category": "Power Platform",
+      "product_name": "Power Apps",
+      "sku_name": "Premium",
+      "billing_unit": "user/month",
+      "quantity_driver": "maker_or_app_user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/power-platform/products/power-apps/pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 20,
+      "unit_price_jpy": 3104,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-POWERAUTOMATE-PREMIUM",
+      "service_category": "Power Platform",
+      "product_name": "Power Automate",
+      "sku_name": "Premium",
+      "billing_unit": "user/month",
+      "quantity_driver": "flow_owner_or_premium_user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/power-platform/products/power-automate/pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 15,
+      "unit_price_jpy": 2328,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-COPILOTSTUDIO-MESSAGES",
+      "service_category": "Power Platform",
+      "product_name": "Copilot Studio",
+      "sku_name": "Messages or capacity",
+      "billing_unit": "tenant/month",
+      "quantity_driver": "copilot_studio_messages",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/power-platform/products/power-apps/pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 200,
+      "unit_price_jpy": 31040,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-POWERBI-PRO",
+      "service_category": "Power Platform",
+      "product_name": "Power BI",
+      "sku_name": "Pro",
+      "billing_unit": "user/month",
+      "quantity_driver": "power_bi_user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/power-platform/products/power-bi/pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 14,
+      "unit_price_jpy": 2172.8,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-DATAVERSE-CAPACITY",
+      "service_category": "Power Platform",
+      "product_name": "Dataverse",
+      "sku_name": "Database capacity",
+      "billing_unit": "GB/month",
+      "quantity_driver": "dataverse_storage_gb",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/power-platform/products/power-apps/pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 40,
+      "unit_price_jpy": 6208,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-AZURE-OPENAI-TOKENS",
+      "service_category": "Azure",
+      "product_name": "Azure OpenAI",
+      "sku_name": "Token usage",
+      "billing_unit": "token",
+      "quantity_driver": "azure_openai_tokens",
+      "price_source_type": "azure_retail_api",
+      "official_source_url": "https://learn.microsoft.com/rest/api/cost-management/retail-prices/azure-retail-prices",
+      "default_currency": "USD",
+      "pricing_region": "region",
+      "unit_price_usd": 6,
+      "unit_price_jpy": 931.2,
+      "captured_at": "2026-06-14T09:30:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-AZURE-FUNCTIONS",
+      "service_category": "Azure",
+      "product_name": "Azure Functions",
+      "sku_name": "Consumption",
+      "billing_unit": "10 executions",
+      "quantity_driver": "function_execution_units_10",
+      "price_source_type": "azure_retail_api",
+      "official_source_url": "https://learn.microsoft.com/rest/api/cost-management/retail-prices/azure-retail-prices",
+      "default_currency": "USD",
+      "pricing_region": "region",
+      "unit_price_usd": 0.000002,
+      "unit_price_jpy": 0.0003104,
+      "captured_at": "2026-06-14T09:30:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-AZURE-MONITOR",
+      "service_category": "Azure",
+      "product_name": "Azure Monitor",
+      "sku_name": "Log ingestion",
+      "billing_unit": "GB/month",
+      "quantity_driver": "log_ingestion_gb",
+      "price_source_type": "azure_retail_api",
+      "official_source_url": "https://learn.microsoft.com/rest/api/cost-management/retail-prices/azure-retail-prices",
+      "default_currency": "USD",
+      "pricing_region": "region",
+      "unit_price_usd": 3.34,
+      "unit_price_jpy": 518.368,
+      "captured_at": "2026-06-14T09:30:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-ENTRA-ID-P1",
+      "service_category": "Security",
+      "product_name": "Microsoft Entra ID",
+      "sku_name": "P1",
+      "billing_unit": "user/month",
+      "quantity_driver": "user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/security/business/microsoft-entra-pricing",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 6,
+      "unit_price_jpy": 931.2,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    },
+    {
+      "sku_id": "SKU-DEFENDER-BUSINESS",
+      "service_category": "Security",
+      "product_name": "Microsoft Defender for Business",
+      "sku_name": "Defender for Business",
+      "billing_unit": "user/month",
+      "quantity_driver": "user_count",
+      "price_source_type": "official_page",
+      "official_source_url": "https://www.microsoft.com/en-us/security/business/endpoint-security/microsoft-defender-business",
+      "default_currency": "USD",
+      "pricing_region": "global",
+      "unit_price_usd": 3,
+      "unit_price_jpy": 465.6,
+      "captured_at": "2026-06-14T09:00:00+09:00",
+      "confidence": "High"
+    }
+  ],
+  "existingLicenses": [
+    {
+      "existing_license_id": "EL-001",
+      "license_name": "Microsoft 365 E3",
+      "product_name": "Microsoft 365",
+      "sku_name": "E3",
+      "quantity": 120,
+      "assigned_scope": "全社またはPoC対象部門",
+      "applicable_services": [
+        "SharePoint Online",
+        "Teams",
+        "Office apps",
+        "Exchange Online",
+        "Entra ID P1"
+      ],
+      "notes": "ダッシュボード入力値"
+    },
+    {
+      "existing_license_id": "EL-002",
+      "license_name": "Power BI Pro",
+      "product_name": "Power BI",
+      "sku_name": "Pro",
+      "quantity": 30,
+      "assigned_scope": "レポート作成者・閲覧者",
+      "applicable_services": [
+        "Power BI"
+      ],
+      "notes": "ダッシュボード入力値"
+    }
+  ],
+  "lines": [],
+  "metrics": {},
+  "audit": null,
+  "azureMeter": null,
+  "outputs": [
+    {
+      "name": "price-source-audit-20260614.json",
+      "relative": "outputs/price-source-audit-20260614.json",
+      "kind": "JSON",
+      "bytes": 7367,
+      "modifiedAt": "2026-06-14T09:50:28.372Z",
+      "downloadUrl": "outputs/price-source-audit-20260614.json"
+    },
+    {
+      "name": "price-source-audit-20260614.md",
+      "relative": "outputs/price-source-audit-20260614.md",
+      "kind": "監査MD",
+      "bytes": 2582,
+      "modifiedAt": "2026-06-14T09:50:28.365Z",
+      "downloadUrl": "outputs/price-source-audit-20260614.md"
+    },
+    {
+      "name": "azure-meter-estimate-20260614.json",
+      "relative": "outputs/azure-meter-estimate-20260614.json",
+      "kind": "JSON",
+      "bytes": 3815,
+      "modifiedAt": "2026-06-14T09:50:27.628Z",
+      "downloadUrl": "outputs/azure-meter-estimate-20260614.json"
+    },
+    {
+      "name": "azure-meter-estimate-20260614.md",
+      "relative": "outputs/azure-meter-estimate-20260614.md",
+      "kind": "Azure明細MD",
+      "bytes": 1626,
+      "modifiedAt": "2026-06-14T09:50:27.628Z",
+      "downloadUrl": "outputs/azure-meter-estimate-20260614.md"
+    },
+    {
+      "name": "ms-license-summary-営業部向けai業務支援poc-20260614.pptx",
+      "relative": "outputs/ms-license-summary-営業部向けai業務支援poc-20260614.pptx",
+      "kind": "PowerPoint",
+      "bytes": 34737,
+      "modifiedAt": "2026-06-14T09:50:16.754Z",
+      "downloadUrl": "outputs/ms-license-summary-営業部向けai業務支援poc-20260614.pptx"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx",
+      "relative": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx",
+      "kind": "Excel",
+      "bytes": 15284,
+      "modifiedAt": "2026-06-14T09:50:02.059Z",
+      "downloadUrl": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260614.md",
+      "relative": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260614.md",
+      "kind": "Markdown",
+      "bytes": 12801,
+      "modifiedAt": "2026-06-14T09:49:58.737Z",
+      "downloadUrl": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260614.md"
+    },
+    {
+      "name": "batch-manifest.json",
+      "relative": "outputs/batch-20260614/batch-manifest.json",
+      "kind": "JSON",
+      "bytes": 6501,
+      "modifiedAt": "2026-06-14T09:22:09.201Z",
+      "downloadUrl": "outputs/batch-20260614/batch-manifest.json"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx",
+      "relative": "outputs/batch-20260614/ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx",
+      "kind": "Excel",
+      "bytes": 15048,
+      "modifiedAt": "2026-06-14T09:22:01.095Z",
+      "downloadUrl": "outputs/batch-20260614/ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260614.md",
+      "relative": "outputs/batch-20260614/ms-license-estimate-営業部向けai業務支援poc-20260614.md",
+      "kind": "Markdown",
+      "bytes": 11852,
+      "modifiedAt": "2026-06-14T09:21:55.632Z",
+      "downloadUrl": "outputs/batch-20260614/ms-license-estimate-営業部向けai業務支援poc-20260614.md"
+    },
+    {
+      "name": "source-notes.png",
+      "relative": "outputs/excel-previews/source-notes.png",
+      "kind": "Preview",
+      "bytes": 147176,
+      "modifiedAt": "2026-06-14T09:20:20.757Z",
+      "downloadUrl": "outputs/excel-previews/source-notes.png"
+    },
+    {
+      "name": "price-trend.png",
+      "relative": "outputs/excel-previews/price-trend.png",
+      "kind": "Preview",
+      "bytes": 194068,
+      "modifiedAt": "2026-06-14T09:20:20.411Z",
+      "downloadUrl": "outputs/excel-previews/price-trend.png"
+    },
+    {
+      "name": "license-estimate.png",
+      "relative": "outputs/excel-previews/license-estimate.png",
+      "kind": "Preview",
+      "bytes": 180128,
+      "modifiedAt": "2026-06-14T09:20:19.566Z",
+      "downloadUrl": "outputs/excel-previews/license-estimate.png"
+    },
+    {
+      "name": "summary.png",
+      "relative": "outputs/excel-previews/summary.png",
+      "kind": "Preview",
+      "bytes": 75054,
+      "modifiedAt": "2026-06-14T09:20:18.624Z",
+      "downloadUrl": "outputs/excel-previews/summary.png"
+    },
+    {
+      "name": "price-source-audit-20260612.json",
+      "relative": "outputs/price-source-audit-20260612.json",
+      "kind": "JSON",
+      "bytes": 7467,
+      "modifiedAt": "2026-06-12T14:19:19.166Z",
+      "downloadUrl": "outputs/price-source-audit-20260612.json"
+    },
+    {
+      "name": "price-source-audit-20260612.md",
+      "relative": "outputs/price-source-audit-20260612.md",
+      "kind": "監査MD",
+      "bytes": 3519,
+      "modifiedAt": "2026-06-12T14:19:19.147Z",
+      "downloadUrl": "outputs/price-source-audit-20260612.md"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260612.xlsx",
+      "relative": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260612.xlsx",
+      "kind": "Excel",
+      "bytes": 14296,
+      "modifiedAt": "2026-06-12T07:31:32.631Z",
+      "downloadUrl": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260612.xlsx"
+    },
+    {
+      "name": "ms-license-estimate-営業部向けai業務支援poc-20260612.md",
+      "relative": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260612.md",
+      "kind": "Markdown",
+      "bytes": 10633,
+      "modifiedAt": "2026-06-12T07:31:28.421Z",
+      "downloadUrl": "outputs/ms-license-estimate-営業部向けai業務支援poc-20260612.md"
+    }
+  ],
+  "job": {
+    "status": "static",
+    "startedAt": null,
+    "finishedAt": null,
+    "steps": [],
+    "error": null
+  }
+}

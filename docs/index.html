@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MSライセンス概算ナビ</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">MS LICENSE ESTIMATE NAVI</p>
+        <h1>MSライセンス概算ナビ</h1>
+        <p class="header-copy">
+          作りたい業務システムをAIと壁打ちし、Microsoftサービス構成・必要ライセンス・概算コストをその場で組み替える提案前ワークベンチ
+        </p>
+      </div>
+      <div class="header-actions">
+        <button id="refreshBtn" class="button secondary" type="button">更新</button>
+        <button id="saveBtn" class="button secondary" type="button">条件を保存</button>
+        <button id="generateBtn" class="button primary" type="button">提案パック生成</button>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="summary-band" aria-label="概算サマリー">
+        <div class="metric-block">
+          <span>月額 USD</span>
+          <strong id="monthlyUsd">-</strong>
+        </div>
+        <div class="metric-block">
+          <span>月額 JPY</span>
+          <strong id="monthlyJpy">-</strong>
+        </div>
+        <div class="metric-block">
+          <span>年額 USD</span>
+          <strong id="annualUsd">-</strong>
+        </div>
+        <div class="metric-block">
+          <span>追加SKU</span>
+          <strong id="additionalSkuCount">-</strong>
+        </div>
+        <div class="metric-block">
+          <span>価格基準</span>
+          <strong id="pricingAsOf">-</strong>
+        </div>
+      </section>
+
+      <section class="workbench-grid">
+        <section class="panel chat-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>壁打ち</h2>
+              <p>ユーザーが「こんなものを作りたい」と投げる場所</p>
+            </div>
+          </div>
+
+          <div id="chatLog" class="chat-log" aria-live="polite"></div>
+
+          <div class="prompt-chips" aria-label="入力例">
+            <button class="chip" type="button" data-prompt="営業担当が過去提案書、FAQ、商談メモを検索して、提案書のドラフトと回答根拠を作れるAIエージェントを作りたい。Teamsから使いたい。">営業ナレッジAI</button>
+            <button class="chip" type="button" data-prompt="稟議や過去承認案件を検索して、類似案件、承認条件、注意点を要約する社内エージェントを作りたい。承認フローも回したい。">稟議検索</button>
+            <button class="chip" type="button" data-prompt="地政学レポートを読み込み、Evidence Packとして要点、根拠、リスク、対応案を生成する業務支援ツールを作りたい。">Evidence Pack</button>
+          </div>
+
+          <label class="field chat-input-field">
+            <span>相談内容</span>
+            <textarea id="promptInput" rows="5" placeholder="例：営業部向けに、過去案件やFAQを検索して提案書ドラフトを作るAIエージェントを作りたい。Teamsで利用、120名、レポートも見たい。"></textarea>
+          </label>
+
+          <div class="chat-actions">
+            <button id="sendPromptBtn" class="button primary" type="button">AIに相談する</button>
+            <button id="resetScenarioBtn" class="button ghost" type="button">初期案に戻す</button>
+          </div>
+        </section>
+
+        <section class="panel architecture-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>AI提案アーキテクチャ</h2>
+              <p id="architectureSubtitle">入力内容からMicrosoftサービス構成を組み立てます</p>
+            </div>
+          </div>
+
+          <div id="architectureCanvas" class="architecture-canvas" aria-label="アーキテクチャ図"></div>
+
+          <div class="proposal-grid">
+            <div class="proposal-block">
+              <span>提案方針</span>
+              <p id="proposalIntent">-</p>
+            </div>
+            <div class="proposal-block">
+              <span>主な前提</span>
+              <ul id="assumptionList"></ul>
+            </div>
+            <div class="proposal-block">
+              <span>非機能観点</span>
+              <ul id="nfrList"></ul>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel control-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>動的設定</h2>
+              <p>人数・既存ライセンス・Azure利用量を変えると即時再計算</p>
+            </div>
+          </div>
+
+          <div class="control-section">
+            <h3>案件</h3>
+            <label class="field">
+              <span>案件名</span>
+              <input id="projectName" type="text" />
+            </label>
+            <label class="field">
+              <span>業務目的</span>
+              <textarea id="businessPurpose" rows="3"></textarea>
+            </label>
+          </div>
+
+          <div class="control-section two-col">
+            <h3>利用規模</h3>
+            <label class="field">
+              <span>利用ユーザー数</span>
+              <input id="userCount" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>Maker / 開発者数</span>
+              <input id="makerCount" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>管理者数</span>
+              <input id="adminCount" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>BI閲覧者数</span>
+              <input id="viewerCount" type="number" min="0" />
+            </label>
+          </div>
+
+          <div class="control-section two-col">
+            <h3>Azure利用量</h3>
+            <label class="field">
+              <span>AOAI 入力 tokens/月</span>
+              <input id="inputTokens" type="number" min="0" step="1000" />
+            </label>
+            <label class="field">
+              <span>AOAI 出力 tokens/月</span>
+              <input id="outputTokens" type="number" min="0" step="1000" />
+            </label>
+            <label class="field">
+              <span>Copilotメッセージ/月</span>
+              <input id="copilotMessages" type="number" min="0" step="1000" />
+            </label>
+            <label class="field">
+              <span>ログ取り込み GB/月</span>
+              <input id="logIngestionGb" type="number" min="0" step="0.1" />
+            </label>
+            <label class="field">
+              <span>Dataverse追加GB</span>
+              <input id="dataverseGb" type="number" min="0" step="1" />
+            </label>
+            <label class="field">
+              <span>USD/JPY</span>
+              <input id="fxRate" type="number" min="1" step="0.1" />
+            </label>
+          </div>
+
+          <div class="control-section two-col">
+            <h3>既存ライセンス</h3>
+            <label class="field">
+              <span>M365 E3</span>
+              <input id="existingM365E3" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>Power Apps Premium</span>
+              <input id="existingPowerApps" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>Power Automate Premium</span>
+              <input id="existingPowerAutomate" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span>Power BI Pro</span>
+              <input id="existingPowerBi" type="number" min="0" />
+            </label>
+          </div>
+        </aside>
+      </section>
+
+      <section class="detail-grid">
+        <section class="panel table-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>ライセンス・Azure概算</h2>
+              <p id="estimateNote">設定値とSKUマスタに基づく提案前概算</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>サービス / SKU</th>
+                  <th>必要理由</th>
+                  <th>必要数</th>
+                  <th>既存</th>
+                  <th>追加</th>
+                  <th>単価 USD</th>
+                  <th>月額 USD</th>
+                </tr>
+              </thead>
+              <tbody id="lineRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel download-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>出力・ダウンロード</h2>
+              <p>保存した条件でMarkdown / Excel / PowerPointを生成</p>
+            </div>
+            <span id="jobBadge" class="status-pill">idle</span>
+          </div>
+
+          <div class="format-grid">
+            <label><input type="checkbox" name="format" value="markdown" checked /> Markdown</label>
+            <label><input type="checkbox" name="format" value="excel" checked /> Excel</label>
+            <label><input type="checkbox" name="format" value="pptx" checked /> PowerPoint</label>
+            <label><input type="checkbox" name="format" value="azureMeter" checked /> Azure明細</label>
+            <label><input type="checkbox" name="format" value="audit" checked /> 価格監査</label>
+          </div>
+
+          <div id="jobLog" class="job-log" aria-live="polite"></div>
+
+          <div class="segmented" role="group" aria-label="成果物フィルター">
+            <button class="segment active" type="button" data-kind="all">All</button>
+            <button class="segment" type="button" data-kind="Excel">Excel</button>
+            <button class="segment" type="button" data-kind="PowerPoint">PPTX</button>
+            <button class="segment" type="button" data-kind="Markdown">MD</button>
+            <button class="segment" type="button" data-kind="JSON">JSON</button>
+          </div>
+          <div id="downloads" class="download-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+{
+  "estimate": {
+    "estimate_id": "EST-20260612-001",
+    "project_name": "営業部向けAI業務支援PoC",
+    "customer_name": "",
+    "estimate_purpose": "提案前概算",
+    "base_currency": "USD",
+    "converted_currency": "JPY",
+    "fx_rate_usd_jpy": 155.2,
+    "pricing_as_of": "2026-06-14T09:00:00+09:00",
+    "fx_as_of": "2026-06-12T09:00:00+09:00",
+    "status": "draft"
+  },
+  "requirements": {
+    "business_purpose": "営業担当が過去提案書、FAQ、商談メモを検索し、提案書ドラフトと回答根拠を作成できるAIエージェントを構築する。",
+    "proposal_intent": "TeamsからCopilot Studioエージェントを利用し、SharePointのナレッジとAzure OpenAIを組み合わせて、回答生成・要約・提案書ドラフト作成を支援する。",
+    "target_departments": [
+      "営業部",
+      "営業企画",
+      "プリセールス"
+    ],
+    "region": "Japan",
+    "user_count": 120,
+    "admin_count": 5,
+    "maker_count": 15,
+    "power_bi_viewer_count": 30,
+    "external_user_count": 0,
+    "required_capabilities": [
+      "Microsoft 365 document collaboration",
+      "Teams collaboration",
+      "SharePoint knowledge base",
+      "Copilot Studio agent",
+      "Azure OpenAI summarization",
+      "RAG search",
+      "AI draft generation",
+      "Power Automate workflow",
+      "Power BI reporting",
+      "Microsoft Entra ID authentication",
+      "Audit and security monitoring"
+    ],
+    "architecture": {
+      "channel": "Teams / Web",
+      "conversation": "Copilot Studio",
+      "app": "Power Apps",
+      "data": "SharePoint / Dataverse",
+      "ai": "Azure OpenAI",
+      "automation": "Power Automate / Functions",
+      "analytics": "Power BI",
+      "security": "Entra ID / Azure Monitor"
+    },
+    "assumptions": [
+      "提案前の概算であり、EA/CSP割引、税、契約条件は含めない。",
+      "価格はSKUマスタの公式価格スナップショットを優先し、不足分は明示した仮単価で計算する。",
+      "Microsoft 365 E3を既存保有している場合、SharePoint/Teams/基本IDの追加費用は既存分で控除する。"
+    ],
+    "nfr": [
+      "認証はEntra IDを前提にし、必要に応じて条件付きアクセスを設計する。",
+      "利用ログ、エラー、監査ログはAzure Monitorに集約する。",
+      "PoCでは月次利用量を設定値として管理し、本番前に実績値で再見積もりする。"
+    ],
+    "monthly_usage_assumptions": {
+      "copilot_studio_messages": 50000,
+      "azure_openai": {
+        "model": "gpt-4o-mini-0718",
+        "region": "japaneast",
+        "region_display_name": "Japan East",
+        "input_tokens": 20000000,
+        "output_tokens": 5000000,
+        "pricing_unit": "1K tokens",
+        "input_meter_name": "gpt-4o-mini-0718-Inp-glbl Tokens",
+        "output_meter_name": "gpt-4o-mini-0718-Outp-glbl Tokens",
+        "input_unit_price_usd_per_1k_tokens": 0.00015,
+        "output_unit_price_usd_per_1k_tokens": 0.0006,
+        "estimated_monthly_usd": 6
+      },
+      "azure_openai_input_tokens": 20000000,
+      "azure_openai_output_tokens": 5000000,
+      "power_automate_flow_runs": 30000,
+      "function_executions": 30000,
+      "dataverse_storage_gb": 20,
+      "log_ingestion_gb": 1,
+      "sharepoint_storage_gb": 500
+    },
+    "unknown_items": [
+      {
+        "item": "既存Microsoft 365プランの詳細",
+        "assumption": "Microsoft 365 E3相当が120ユーザー分あるものとして仮置きする。",
+        "impact": "SharePoint、Teams、Office、Entra ID P1の追加費用判定に影響する。"
+      },
+      {
+        "item": "Azure OpenAIモデルとリージョン",
+        "assumption": "PoC段階ではgpt-4o-mini、Japan Eastを代表モデル・リージョンとして概算する。",
+        "impact": "Azure従量課金の単価と月額費用に影響する。"
+      }
+    ]
+  },
+  "output_options": {
+    "generate_excel": true,
+    "generate_markdown": true,
+    "include_mermaid_architecture": true,
+    "include_price_trend": true,
+    "include_source_notes": true
+  },
+  "estimation_policy": {
+    "mode": "proposal_rough_order",
+    "include_tax": false,
+    "include_ea_or_csp_discount": false,
+    "allow_manual_price_when_api_unavailable": true,
+    "disclaimer_required": true
+  }
+}

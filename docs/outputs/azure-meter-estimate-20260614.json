@@ -1,0 +1,119 @@
+{
+  "inputPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\sample-input.json",
+  "rulesPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\rules\\azure-meter-aggregation-rules.json",
+  "summary": {
+    "total_monthly_usd": 9.34,
+    "by_sku": [
+      {
+        "sku_id": "SKU-AZURE-OPENAI-TOKENS",
+        "monthly_usd": 5.999999999999999,
+        "rules": [
+          "AZURE-OPENAI-GPT4O-MINI-JAPANEAST"
+        ]
+      },
+      {
+        "sku_id": "SKU-AZURE-MONITOR",
+        "monthly_usd": 3.34,
+        "rules": [
+          "AZURE-MONITOR-LOG-INGESTION-JAPANEAST"
+        ]
+      },
+      {
+        "sku_id": "SKU-AZURE-FUNCTIONS",
+        "monthly_usd": 0,
+        "rules": [
+          "AZURE-FUNCTIONS-STANDARD-EXECUTIONS-JAPANEAST"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "rule_id": "AZURE-OPENAI-GPT4O-MINI-JAPANEAST",
+      "sku_id": "SKU-AZURE-OPENAI-TOKENS",
+      "label": "Azure OpenAI gpt-4o-mini token usage",
+      "model": "gpt-4o-mini-0718",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "pricing_unit": "1K tokens",
+      "aggregate_formula": "(input_tokens / 1000 * input_unit_price) + (output_tokens / 1000 * output_unit_price)",
+      "components": [
+        {
+          "component_id": "input_tokens",
+          "label": "Input tokens",
+          "meter_name": "gpt-4o-mini-0718-Inp-glbl Tokens",
+          "usage_field": "input_tokens",
+          "usage_quantity": 20000000,
+          "usage_unit": "tokens",
+          "usage_divisor": 1000,
+          "pricing_unit": "1K tokens",
+          "unit_price_usd": 0.00015,
+          "monthly_usd": 2.9999999999999996
+        },
+        {
+          "component_id": "output_tokens",
+          "label": "Output tokens",
+          "meter_name": "gpt-4o-mini-0718-Outp-glbl Tokens",
+          "usage_field": "output_tokens",
+          "usage_quantity": 5000000,
+          "usage_unit": "tokens",
+          "usage_divisor": 1000,
+          "pricing_unit": "1K tokens",
+          "unit_price_usd": 0.0006,
+          "monthly_usd": 2.9999999999999996
+        }
+      ],
+      "monthly_usd": 5.999999999999999
+    },
+    {
+      "rule_id": "AZURE-MONITOR-LOG-INGESTION-JAPANEAST",
+      "sku_id": "SKU-AZURE-MONITOR",
+      "label": "Azure Monitor Log Analytics ingestion",
+      "model": "",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "pricing_unit": "GB",
+      "aggregate_formula": "log_ingestion_gb * unit_price",
+      "components": [
+        {
+          "component_id": "log_ingestion",
+          "label": "Analytics Logs Data Ingestion",
+          "meter_name": "Analytics Logs Data Ingestion",
+          "usage_field": "log_ingestion_gb",
+          "usage_quantity": 1,
+          "usage_unit": "GB",
+          "usage_divisor": 1,
+          "pricing_unit": "GB",
+          "unit_price_usd": 3.34,
+          "monthly_usd": 3.34
+        }
+      ],
+      "monthly_usd": 3.34
+    },
+    {
+      "rule_id": "AZURE-FUNCTIONS-STANDARD-EXECUTIONS-JAPANEAST",
+      "sku_id": "SKU-AZURE-FUNCTIONS",
+      "label": "Azure Functions Standard executions",
+      "model": "",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "pricing_unit": "10 executions",
+      "aggregate_formula": "(function_executions / 10) * unit_price",
+      "components": [
+        {
+          "component_id": "standard_total_executions",
+          "label": "Standard Total Executions",
+          "meter_name": "Standard Total Executions",
+          "usage_field": "function_executions",
+          "usage_quantity": 0,
+          "usage_unit": "executions",
+          "usage_divisor": 10,
+          "pricing_unit": "10 executions",
+          "unit_price_usd": 0.000002,
+          "monthly_usd": 0
+        }
+      ],
+      "monthly_usd": 0
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "version": "2026-06-14",
+  "description": "Azure従量課金SKUの見積用メーター集約ルール。複数メーターを持つSKUはcomponentsを合算し、提案前概算の月額USDを算出する。",
+  "currency": "USD",
+  "rules": [
+    {
+      "rule_id": "AZURE-OPENAI-GPT4O-MINI-JAPANEAST",
+      "sku_id": "SKU-AZURE-OPENAI-TOKENS",
+      "label": "Azure OpenAI gpt-4o-mini token usage",
+      "usage_object_path": "requirements.monthly_usage_assumptions.azure_openai",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "model": "gpt-4o-mini-0718",
+      "pricing_unit": "1K tokens",
+      "aggregate_formula": "(input_tokens / 1000 * input_unit_price) + (output_tokens / 1000 * output_unit_price)",
+      "components": [
+        {
+          "component_id": "input_tokens",
+          "label": "Input tokens",
+          "usage_field": "input_tokens",
+          "meter_name": "gpt-4o-mini-0718-Inp-glbl Tokens",
+          "unit_price_usd": 0.00015,
+          "usage_divisor": 1000,
+          "usage_unit": "tokens"
+        },
+        {
+          "component_id": "output_tokens",
+          "label": "Output tokens",
+          "usage_field": "output_tokens",
+          "meter_name": "gpt-4o-mini-0718-Outp-glbl Tokens",
+          "unit_price_usd": 0.0006,
+          "usage_divisor": 1000,
+          "usage_unit": "tokens"
+        }
+      ]
+    },
+    {
+      "rule_id": "AZURE-MONITOR-LOG-INGESTION-JAPANEAST",
+      "sku_id": "SKU-AZURE-MONITOR",
+      "label": "Azure Monitor Log Analytics ingestion",
+      "usage_object_path": "requirements.monthly_usage_assumptions",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "pricing_unit": "GB",
+      "aggregate_formula": "log_ingestion_gb * unit_price",
+      "components": [
+        {
+          "component_id": "log_ingestion",
+          "label": "Analytics Logs Data Ingestion",
+          "usage_field": "log_ingestion_gb",
+          "meter_name": "Analytics Logs Data Ingestion",
+          "unit_price_usd": 3.34,
+          "usage_divisor": 1,
+          "usage_unit": "GB"
+        }
+      ]
+    },
+    {
+      "rule_id": "AZURE-FUNCTIONS-STANDARD-EXECUTIONS-JAPANEAST",
+      "sku_id": "SKU-AZURE-FUNCTIONS",
+      "label": "Azure Functions Standard executions",
+      "usage_object_path": "requirements.monthly_usage_assumptions",
+      "region": "japaneast",
+      "region_display_name": "Japan East",
+      "pricing_unit": "10 executions",
+      "aggregate_formula": "(function_executions / 10) * unit_price",
+      "components": [
+        {
+          "component_id": "standard_total_executions",
+          "label": "Standard Total Executions",
+          "usage_field": "function_executions",
+          "default_usage_quantity": 0,
+          "meter_name": "Standard Total Executions",
+          "unit_price_usd": 0.000002,
+          "usage_divisor": 10,
+          "usage_unit": "executions"
+        }
+      ]
+    }
+  ]
+}

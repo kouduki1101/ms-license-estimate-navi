@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-06-14T09:22:09.190Z",
+  "formats": [
+    "md",
+    "xlsx"
+  ],
+  "inputCount": 1,
+  "outDir": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\outputs\\batch-20260614",
+  "results": [
+    {
+      "inputPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\samples\\batch-inputs\\sales-ai-poc.json",
+      "outputs": {
+        "markdown": {
+          "outputPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\outputs\\batch-20260614\\ms-license-estimate-営業部向けai業務支援poc-20260614.md",
+          "estimateLines": 8,
+          "skuRulesPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\rules\\sku-selection-rules.json",
+          "existingLicensesPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\existing_licenses.csv",
+          "knownMonthlyUsd": 1454.34,
+          "unknownPriceCount": 0
+        },
+        "excel": {
+          "outputPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\outputs\\batch-20260614\\ms-license-estimate-営業部向けai業務支援poc-20260614.xlsx",
+          "estimateLines": 8,
+          "trendRows": 12,
+          "skuRulesPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\rules\\sku-selection-rules.json",
+          "existingLicensesPath": "C:\\Users\\kazuki.yoshioka\\.codex\\new-work-20260612\\existing_licenses.csv",
+          "knownMonthlyUsd": 1454.34,
+          "sheetsAndTables": "{\"kind\":\"sheet\",\"id\":\"ws/p4uf5u\",\"name\":\"Summary\",\"index\":0,\"range\":\"A1:E15\",\"address\":\"A1:E15\",\"tables\":1}\n{\"kind\":\"table\",\"sheet\":\"Summary\",\"address\":\"A1:E15\",\"rows\":15,\"cols\":5,\"values\":[[\"MSライセンス概算ナビ 試算サマリー\",null,null,null,null],[null,null,null,null,null],[\"案件名\",\"営業部向けAI業務支援PoC\",null,\"区分\",\"金額\"],[\"試算目的\",\"提案前概算\",null,\"月額 USD\",\"$1,454.34\"],[\"価格基準日時\",\"2026-06-14 09:00 +09:00\",null,\"年額 USD\",\"$17,452.08\"],[\"為替基準日時\",\"2026-06-12 09:00 +09:00\",null,\"月額 JPY\",\"¥225,714\"],[\"為替レート\",\"1 USD = 155.2 JPY\",null,\"年額 JPY\",\"¥2,708,563\"],[\"一般利用者数\",120,null,null,null],[\"管理者数\",5,null,null,null],[\"作成者/メーカー数\",15,null,null,null],[\"既知価格ベース月額 USD\",\"$1,454.34\",null,null,null],[\"既知価格ベース月額 JPY\",\"¥225,714\",null,null,null],[\"検証用サンプル単価SKU\",0,null,null,null],[null,null,null,null,null],[\"注記: このブックはsku_price_snapshot.csvに登録されたMicrosoft公式価格ページおよびAzure Retail Prices API由来の価格スナップショットに基づく概算です。税、EA/CSP割引、契約条件、リージョン差分は別途確認してください。\",null,null,null,null]]}\n{\"kind\":\"sheet\",\"id\":\"ws/h2kz01\",\"name\":\"License Estimate\",\"index\":1,\"range\":\"A1:R9\",\"address\":\"A1:R9\",\"tables\":1}\n{\"kind\":\"table\",\"sheet\":\"License Estimate\",\"address\":\"A1:R9\",\"rows\":9,\"cols\":18,\"values\":[[\"Line ID\",\"Service Category\",\"Product\",\"SKU\",\"Billing Unit\",\"Required Qty\",\"Existing Qty\",\"Additional Qty\",\"USD Unit\",\"USD Monthly\",\"USD Annual\",\"JPY Monthly\",\"JPY Annual\",\"Status\",\"Confidence\",\"Source Type\",\"License Reason\",\"Quantity Reason\"],[\"L001\",\"Microsoft 365\",\"Microsoft 365\",\"E3\",\"user/month\",120,120,0,36,0,0,0,0,\"既存充足\",\"High\",\"official_page\",\"Microsoft 365 E3相当のユーザー単位ライセンス。既存入力で充足判定する\",\"一般利用者数 120 名を数量ドライバーとした。\"],[\"L002\",\"Power Platform\",\"Power Apps\",\"Premium\",\"user/month\",15,0,15,20,300,3600,46560,558720,\"追加購入候補\",\"High\",\"official_page\",\"プレミアムコネクタやDataverse利用を想定するアプリ利用者・作成者に対する候補\",\"Power Apps / Power Platform作成・利用の中心ユーザーを 15 名と仮定した。\"],[\"L003\",\"Power Platform\",\"Power Automate\",\"Premium\",\"user/month\",15,0,15,15,225,2700,34920,419040,\"追加購入候補\",\"High\",\"official_page\",\"プレミアムコネクタや高度な自動化を使うユーザーに対する候補\",\"プレミアムフローを作成・運用する担当者を 15 名と仮定した。\"],[\"L004\",\"Power Platform\",\"Copilot Studio\",\"Messages or capacity\",\"tenant/month\",1,0,1,200,200,2400,31040,372480,\"追加購入候補\",\"High\",\"official_page\",\"Copilot Studioエージェント利用時の容量・メッセージ課金候補\",\"PoC単位で1テナント/容量枠、月間 50000 メッセージを前提とした。\"],[\"L005\",\"Power Platform\",\"Power BI\",\"Pro\",\"user/month\",30,30,0,14,0,0,0,0,\"既存充足\",\"High\",\"official_page\",\"レポート作成者・共有閲覧者に対する候補\",\"Power BI利用者数は既存ライセンス数または作成者数をもとに仮置きした。\"],[\"L006\",\"Azure\",\"Azure OpenAI\",\"Token usage\",\"token\",1,0,1,6,6,72,931.2,11174.400000000001,\"従量課金候補\",\"High\",\"azure_retail_api\",\"モデル・リージョン・トークン利用量に基づくAzure従量課金候補\",\"Azure OpenAIはJapan East / gpt-4o-mini-0718 を前提に、入力 20000000 tokens、出力 5000000 tokensを月間利用量とした。単価は入力 $0.00015/1K tokens、出力 $0.0006/1K tokens、月額 $6.00。\"],[\"L007\",\"Security\",\"Microsoft Entra ID\",\"P1\",\"user/month\",120,0,120,6,720,8640,111744,1340928,\"追加購入候補\",\"High\",\"official_page\",\"条件付きアクセス等が必要な場合の候補\",\"一般利用者数 120 名を数量ドライバーとした。\"],[\"L008\",\"Azure\",\"Azure Monitor\",\"Log ingestion\",\"GB/month\",1,0,1,3.34,3.34,40.08,518.368,6220.416000000001,\"従量課金候補\",\"High\",\"azure_retail_api\",\"監視ログ・アプリログの取り込み量に応じた候補\",\"監視ログ取り込み量は 1 GB/月として扱った。\"]]}\n{\"kind\":\"sheet\",\"id\":\"ws/lvp6t1\",\"name\":\"Price Trend\",\"index\":2,\"range\":\"A1:L28\",\"address\":\"A1:L28\",\"tables\":1}\n{\"kind\":\"notice\",\"message\":\"Truncated: omitted 3 lines. Increase maxChars, narrow range, or use tableMaxRows/tableMaxCols/tableMaxCellChars.\"}",
+          "formulaErrors": "{\"kind\":\"notice\",\"message\":\"Cell search matched 0 entries.\"}"
+        }
+      }
+    }
+  ]
+}
