@@ -53,24 +53,37 @@
             </div>
           </div>
 
+          <div class="flow-steps" aria-label="操作フロー">
+            <span><strong>1</strong>相談を書く</span>
+            <span><strong>2</strong>構成を作る</span>
+            <span><strong>3</strong>人数を調整</span>
+            <span><strong>4</strong>出力を取得</span>
+          </div>
+
+          <div id="actionStatus" class="action-status" aria-live="polite">初期データを読み込んでいます...</div>
+
           <textarea id="promptInput" class="prompt-box" rows="8" placeholder="例: 営業担当がTeamsから過去提案書、FAQ、商談メモを検索し、根拠付き回答と提案書ドラフトを作れるAIエージェントを作りたい。利用者120名、レポートも見たい。"></textarea>
 
           <div class="preset-grid">
             <button class="preset-card" type="button" data-prompt="営業担当がTeamsから過去提案書、FAQ、商談メモを検索し、根拠付き回答と提案書ドラフトを作れるAIエージェントを作りたい。利用者120名、レポートも見たい。">
               <strong>営業ナレッジAI</strong>
               <span>RAG、提案書ドラフト、利用分析</span>
+              <em>この例で試す</em>
             </button>
             <button class="preset-card" type="button" data-prompt="稟議や過去承認案件を検索し、類似案件、承認条件、注意点を要約する社内エージェントを作りたい。申請画面と承認フローも含めたい。">
               <strong>稟議・承認支援</strong>
               <span>Power Apps、Dataverse、承認フロー</span>
+              <em>この例で試す</em>
             </button>
             <button class="preset-card" type="button" data-prompt="地政学レポートやPDFを読み込み、Evidence Packとして要点、根拠、リスク、対応案を生成する業務支援ツールを作りたい。">
               <strong>Evidence Pack</strong>
               <span>文書取込、根拠抽出、リスク整理</span>
+              <em>この例で試す</em>
             </button>
             <button class="preset-card" type="button" data-prompt="複数部門のExcel、SharePointリスト、業務データを集約して、経営向けKPIダッシュボードと月次レポートをPower BIで出したい。">
               <strong>経営BI</strong>
               <span>データ集約、Power BI、月次配信</span>
+              <em>この例で試す</em>
             </button>
           </div>
 

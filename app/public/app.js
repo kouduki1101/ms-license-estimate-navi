@@ -347,6 +347,10 @@ const state = {
   scenario: null,
   filter: "all",
   staticMode: false,
+  generatedDownloads: [],
+  pendingPrompt: "",
+  promptDirty: false,
+  isComposing: false,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -386,6 +390,28 @@ function modifiedLabel(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleString("ja-JP", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+
+function setActionStatus(message, tone = "info") {
+  const target = $("#actionStatus");
+  if (!target) return;
+  target.textContent = message;
+  target.dataset.tone = tone;
+}
+
+function ensureReady() {
+  if (state.data && state.scenario) return true;
+  setActionStatus("初期データを読み込み中です。入力内容は保持します。", "warn");
+  return false;
+}
+
+function fileSlug(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "ms-license-estimate";
 }
 
 function unique(values) {
@@ -704,6 +730,7 @@ function renderArchitecture() {
   }).join("");
   const nodes = state.scenario.nodes.map((node) => {
     const p = positions.get(node.id);
+    if (!p) return "";
     return `
       <g>
         <rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="10" fill="${color[node.lane]}" stroke="#b9c6d2" />
@@ -827,6 +854,47 @@ function applyPrompt(prompt) {
   addMessage("ai", `${state.scenario.typeLabel} として構成しました。固定テンプレではなく、検知した要件に応じてノードとSKUを変更しています。`, state.scenario.changes.slice(0, 3));
 }
 
+function setActivePreset(prompt) {
+  const normalizedPrompt = String(prompt ?? "");
+  $$(".preset-card").forEach((button) => {
+    button.classList.toggle("active", button.dataset.prompt === normalizedPrompt);
+  });
+}
+
+function handlePromptSubmit(rawPrompt) {
+  const prompt = String(rawPrompt ?? "").trim();
+  if (!prompt) {
+    setActionStatus("相談文を入力するか、サンプルを選択してください。", "warn");
+    return;
+  }
+  $("#promptInput").value = prompt;
+  state.promptDirty = true;
+  setActivePreset(prompt);
+  if (!state.scenario) {
+    state.pendingPrompt = prompt;
+    setActionStatus("初期データの読み込み後、この相談文を自動で反映します。", "warn");
+    return;
+  }
+  addMessage("user", prompt);
+  applyPrompt(prompt);
+  setActionStatus(`構成案を更新しました: ${state.scenario.typeLabel} / SKU ${state.scenario.selectedSkuIds.length}件`, "ok");
+}
+
+function bindReactiveControl(selector) {
+  const element = $(selector);
+  element.addEventListener("compositionstart", () => {
+    state.isComposing = true;
+  });
+  element.addEventListener("compositionend", () => {
+    state.isComposing = false;
+    if (state.scenario) rerenderWorkbench();
+  });
+  element.addEventListener("input", () => {
+    if (!state.scenario || state.isComposing) return;
+    rerenderWorkbench();
+  });
+}
+
 function selectedCapabilities() {
   const ids = new Set(state.scenario.selectedSkuIds);
   const capabilities = [];
@@ -891,13 +959,15 @@ function inputPayload() {
 }
 
 async function saveInput() {
+  if (!ensureReady()) return false;
   setJobBadge({ status: "running" });
   $("#jobLog").textContent = "条件を保存中...";
   if (state.staticMode) {
     localStorage.setItem("ms-license-navi-input", JSON.stringify(inputPayload()));
     setJobBadge({ status: "ok" });
     $("#jobLog").textContent = "ブラウザ内に保存しました。GitHub Pages版ではサーバー保存は行いません。";
-    return;
+    setActionStatus("条件をブラウザに保存しました。", "ok");
+    return true;
   }
   try {
     const response = await fetch("/api/input", {
@@ -911,11 +981,15 @@ async function saveInput() {
     setJobBadge(payload.job);
     $("#jobLog").textContent = "保存しました。この条件で提案パックを生成できます。";
     renderDownloads(payload.outputs ?? []);
+    setActionStatus("条件を保存しました。提案パックを生成できます。", "ok");
+    return true;
   } catch {
     state.staticMode = true;
     localStorage.setItem("ms-license-navi-input", JSON.stringify(inputPayload()));
     setJobBadge({ status: "ok" });
     $("#jobLog").textContent = "ブラウザ内に保存しました。GitHub Pages版ではサーバー保存は行いません。";
+    setActionStatus("サーバー保存が使えないため、ブラウザ内保存に切り替えました。", "warn");
+    return true;
   }
 }
 
@@ -967,30 +1041,166 @@ function proposalMarkdown() {
   ].join("\n");
 }
 
-function downloadText(filename, body, type) {
+function exportEstimatePayload() {
+  const lines = buildEstimateLines();
+  const monthlyUsd = lines.reduce((sum, line) => sum + (Number.isFinite(line.monthly_usd) ? line.monthly_usd : 0), 0);
+  return {
+    generated_at: new Date().toISOString(),
+    pricing_as_of: state.data?.estimate?.pricing_as_of_label ?? "2026-06-14",
+    input: inputPayload(),
+    scenario: {
+      type: state.scenario.typeLabel,
+      intent: state.scenario.intent,
+      changes: state.scenario.changes,
+      assumptions: state.scenario.assumptions,
+      nfr: state.scenario.nfr,
+    },
+    totals: {
+      monthly_usd: monthlyUsd,
+      monthly_jpy: monthlyUsd * state.scenario.fxRate,
+      annual_usd: monthlyUsd * 12,
+      annual_jpy: monthlyUsd * 12 * state.scenario.fxRate,
+    },
+    estimate_lines: lines,
+  };
+}
+
+function excelWorkbookHtml() {
+  const payload = exportEstimatePayload();
+  const s = state.scenario;
+  const rows = payload.estimate_lines.map((line) => `
+    <tr>
+      <td>${escapeHtml(line.product_name)}</td>
+      <td>${escapeHtml(line.sku_name)}</td>
+      <td>${escapeHtml(line.reason)}</td>
+      <td>${line.required_quantity}</td>
+      <td>${line.existing_quantity}</td>
+      <td>${line.additional_quantity}</td>
+      <td>${line.unit_price_usd}</td>
+      <td>${line.monthly_usd}</td>
+      <td>${line.annual_usd}</td>
+      <td>${escapeHtml(line.status)}</td>
+    </tr>`).join("");
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(s.projectName)}</title>
+  <style>
+    body { font-family: Meiryo, Arial, sans-serif; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #999; padding: 6px; }
+    th { background: #1f2937; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>${escapeHtml(s.projectName)}</h1>
+  <p>${escapeHtml(s.businessPurpose)}</p>
+  <table>
+    <tr><th>月額USD</th><td>${payload.totals.monthly_usd}</td><th>月額JPY</th><td>${Math.round(payload.totals.monthly_jpy)}</td></tr>
+    <tr><th>年額USD</th><td>${payload.totals.annual_usd}</td><th>価格時点</th><td>${escapeHtml(payload.pricing_as_of)}</td></tr>
+  </table>
+  <h2>ライセンス・Azure明細</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>サービス</th><th>SKU</th><th>理由</th><th>必要数</th><th>既存</th><th>追加</th><th>単価USD</th><th>月額USD</th><th>年額USD</th><th>状態</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body>
+</html>`;
+}
+
+function powerPointOutlineHtml() {
+  const payload = exportEstimatePayload();
+  const s = state.scenario;
+  const topLines = payload.estimate_lines.slice(0, 8).map((line) => `<li>${escapeHtml(line.product_name)} / ${escapeHtml(line.sku_name)}: ${usd(line.monthly_usd)} - ${escapeHtml(line.reason)}</li>`).join("");
+  const nodes = s.nodes.map((node) => `<li>${escapeHtml(node.label)}: ${escapeHtml(node.detail)}</li>`).join("");
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(s.projectName)} - PowerPoint outline</title>
+  <style>
+    body { margin: 0; font-family: Aptos, Meiryo, sans-serif; background: #e5e7eb; color: #111827; }
+    section { width: 1120px; min-height: 630px; margin: 24px auto; padding: 48px; background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.12); page-break-after: always; }
+    h1 { font-size: 42px; margin: 0 0 18px; }
+    h2 { font-size: 30px; margin: 0 0 18px; }
+    p, li { font-size: 22px; line-height: 1.45; }
+    strong { color: #0f766e; }
+  </style>
+</head>
+<body>
+  <section><h1>${escapeHtml(s.projectName)}</h1><p>${escapeHtml(s.businessPurpose)}</p><p><strong>${escapeHtml(s.typeLabel)}</strong> / ${escapeHtml(payload.pricing_as_of)} 時点概算</p></section>
+  <section><h2>提案方針</h2><p>${escapeHtml(s.intent)}</p><ul>${s.changes.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>
+  <section><h2>アーキテクチャ構成</h2><ul>${nodes}</ul></section>
+  <section><h2>概算コスト</h2><p>月額: <strong>${usd(payload.totals.monthly_usd)}</strong> / ${jpy(payload.totals.monthly_jpy)}</p><p>年額: <strong>${usd(payload.totals.annual_usd)}</strong></p><ul>${topLines}</ul></section>
+</body>
+</html>`;
+}
+
+function createGeneratedFile(filename, body, type, kind) {
   const blob = new Blob([body], { type });
   const url = URL.createObjectURL(blob);
+  return {
+    name: filename,
+    relative: "browser-generated",
+    kind,
+    bytes: blob.size,
+    modifiedAt: new Date().toISOString(),
+    downloadUrl: url,
+    generated: true,
+  };
+}
+
+function rememberGeneratedFiles(files) {
+  const merged = [...files, ...state.generatedDownloads];
+  const keep = merged.slice(0, 12);
+  for (const file of merged.slice(12)) {
+    if (file.generated && file.downloadUrl) URL.revokeObjectURL(file.downloadUrl);
+  }
+  state.generatedDownloads = keep;
+}
+
+function triggerDownload(file) {
+  if (!file?.downloadUrl) return;
   const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
+  anchor.href = file.downloadUrl;
+  anchor.download = file.name;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
 }
 
 async function generate() {
+  if (!ensureReady()) return;
   const button = $("#generateBtn");
+  const originalLabel = button.textContent;
   button.disabled = true;
+  button.textContent = "生成中...";
   try {
-    await saveInput();
+    const saved = await saveInput();
+    if (!saved) return;
     if (state.staticMode) {
       const formats = selectedFormats();
-      const slug = state.scenario.projectName.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "-") || "ms-license-estimate";
-      if (formats.includes("markdown")) downloadText(`${slug}.md`, proposalMarkdown(), "text/markdown;charset=utf-8");
-      if (formats.includes("azureMeter") || formats.includes("audit")) downloadText(`${slug}.json`, JSON.stringify(inputPayload(), null, 2), "application/json;charset=utf-8");
+      if (!formats.length) {
+        setActionStatus("出力形式を1つ以上選択してください。", "warn");
+        return;
+      }
+      const slug = fileSlug(state.scenario.projectName);
+      const generated = [];
+      if (formats.includes("markdown")) generated.push(createGeneratedFile(`${slug}.md`, proposalMarkdown(), "text/markdown;charset=utf-8", "Markdown"));
+      if (formats.includes("excel")) generated.push(createGeneratedFile(`${slug}.xls`, excelWorkbookHtml(), "application/vnd.ms-excel;charset=utf-8", "Excel"));
+      if (formats.includes("pptx")) generated.push(createGeneratedFile(`${slug}-powerpoint-outline.html`, powerPointOutlineHtml(), "text/html;charset=utf-8", "PowerPoint"));
+      if (formats.includes("azureMeter") || formats.includes("audit")) generated.push(createGeneratedFile(`${slug}.json`, JSON.stringify(exportEstimatePayload(), null, 2), "application/json;charset=utf-8", "JSON"));
+      rememberGeneratedFiles(generated);
+      renderDownloads(state.data.outputs ?? []);
+      generated.slice(0, 2).forEach(triggerDownload);
       setJobBadge({ status: "ok" });
-      $("#jobLog").textContent = "Pages版としてMarkdown/JSONを生成しました。Excel/PPTXは同梱済み成果物からダウンロードしてください。";
+      $("#jobLog").textContent = `${generated.length}件のファイルを生成しました。下のダウンロード一覧の先頭に追加しています。\n\nGitHub Pages版ではMarkdown、Excel互換XLS、PowerPoint下書きHTML、JSONをブラウザ内で生成します。`;
+      setActionStatus(`生成完了: ${generated.map((file) => file.name).join(" / ")}`, "ok");
       return;
     }
     setJobBadge({ status: "running" });
@@ -1005,8 +1215,10 @@ async function generate() {
     state.data = payload.state;
     renderJob(payload.state.job);
     renderDownloads(payload.state.outputs ?? []);
+    setActionStatus("提案パックを生成しました。下の一覧からダウンロードできます。", "ok");
   } finally {
     button.disabled = false;
+    button.textContent = originalLabel;
   }
 }
 
@@ -1042,7 +1254,7 @@ function kindVisible(file) {
 
 function renderDownloads(outputs) {
   const target = $("#downloads");
-  const visible = (outputs ?? []).filter(kindVisible);
+  const visible = [...state.generatedDownloads, ...(outputs ?? [])].filter(kindVisible);
   target.innerHTML = "";
   if (visible.length === 0) {
     const empty = document.createElement("div");
@@ -1054,17 +1266,22 @@ function renderDownloads(outputs) {
   for (const file of visible.slice(0, 20)) {
     const row = document.createElement("div");
     row.className = "download-row";
+    const href = escapeHtml(file.downloadUrl ?? file.relative ?? "#");
+    const relative = file.relative ?? file.name;
+    const downloadAttr = file.generated ? ` download="${escapeHtml(file.name)}"` : "";
+    const generatedLabel = file.generated ? "ブラウザ生成" : file.kind;
     row.innerHTML = `
       <div>
-        <strong title="${escapeHtml(file.relative)}">${escapeHtml(file.name)}</strong>
-        <span>${escapeHtml(file.kind)} · ${bytes(file.bytes)} · ${modifiedLabel(file.modifiedAt)}</span>
+        <strong title="${escapeHtml(relative)}">${escapeHtml(file.name)}</strong>
+        <span>${escapeHtml(generatedLabel)} · ${escapeHtml(file.kind)} · ${bytes(file.bytes)} · ${modifiedLabel(file.modifiedAt)}</span>
       </div>
-      <a class="download-link" href="${file.downloadUrl}">Download</a>`;
+      <a class="download-link" href="${href}"${downloadAttr}>Download</a>`;
     target.appendChild(row);
   }
 }
 
 async function loadState() {
+  setActionStatus("初期データを読み込んでいます...");
   try {
     const response = await fetch("/api/state");
     if (!response.ok) throw new Error(await response.text());
@@ -1120,35 +1337,62 @@ async function loadState() {
       fxRate: state.scenario.fxRate,
     };
   }
-  $("#promptInput").value = state.scenario.businessPurpose || DEFAULT_PROMPT;
+  if (!state.promptDirty) $("#promptInput").value = state.scenario.businessPurpose || DEFAULT_PROMPT;
   syncScenarioToControls();
   renderChatInitial();
   rerenderWorkbench();
   renderJob(state.data.job);
   renderDownloads(state.data.outputs ?? []);
+  const pendingPrompt = state.pendingPrompt;
+  state.pendingPrompt = "";
+  if (pendingPrompt) {
+    $("#promptInput").value = pendingPrompt;
+    handlePromptSubmit(pendingPrompt);
+  } else {
+    setActionStatus("準備完了。相談文を入れて構成案を作れます。", "ok");
+  }
 }
 
 function bindEvents() {
   $("#refreshBtn").addEventListener("click", () => loadState().catch(showError));
   $("#saveBtn").addEventListener("click", () => saveInput().catch(showError));
   $("#generateBtn").addEventListener("click", () => generate().catch(showError));
+  const promptInput = $("#promptInput");
+  promptInput.addEventListener("compositionstart", () => {
+    state.isComposing = true;
+  });
+  promptInput.addEventListener("compositionend", () => {
+    state.isComposing = false;
+    state.promptDirty = true;
+  });
+  promptInput.addEventListener("input", () => {
+    state.promptDirty = true;
+    setActivePreset(promptInput.value.trim());
+  });
+  promptInput.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      handlePromptSubmit(promptInput.value);
+    }
+  });
   $("#sendPromptBtn").addEventListener("click", () => {
-    const prompt = $("#promptInput").value.trim();
-    if (!prompt) return;
-    addMessage("user", prompt);
-    applyPrompt(prompt);
+    handlePromptSubmit($("#promptInput").value);
   });
   $("#resetScenarioBtn").addEventListener("click", () => {
+    if (!ensureReady()) return;
     state.scenario = defaultScenario(state.data);
+    state.promptDirty = false;
+    state.pendingPrompt = "";
     $("#promptInput").value = state.scenario.businessPurpose;
+    setActivePreset("");
     syncScenarioToControls();
     renderChatInitial();
     rerenderWorkbench();
+    setActionStatus("初期状態に戻しました。", "ok");
   });
   $$(".preset-card").forEach((button) => {
     button.addEventListener("click", () => {
-      $("#promptInput").value = button.dataset.prompt;
-      $("#sendPromptBtn").click();
+      handlePromptSubmit(button.dataset.prompt);
     });
   });
   [
@@ -1168,7 +1412,7 @@ function bindEvents() {
     "#existingPowerApps",
     "#existingPowerAutomate",
     "#existingPowerBi",
-  ].forEach((selector) => $(selector).addEventListener("input", () => rerenderWorkbench()));
+  ].forEach(bindReactiveControl);
   $$(".segment").forEach((button) => {
     button.addEventListener("click", () => {
       $$(".segment").forEach((item) => item.classList.remove("active"));
@@ -1182,6 +1426,7 @@ function bindEvents() {
 function showError(error) {
   setJobBadge({ status: "failed" });
   $("#jobLog").textContent = error.message || String(error);
+  setActionStatus(error.message || String(error), "error");
 }
 
 bindEvents();
